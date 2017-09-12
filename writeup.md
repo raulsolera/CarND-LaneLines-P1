@@ -1,20 +1,10 @@
 # **Finding Lane Lines on the Road** 
 
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file. But feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Finding Lane Lines on the Road**
-
-The goals / steps of this project are the following:
-* Make a pipeline that finds lane lines on the road
-* Reflect on your work in a written report
-
+The goal of the project is to define a pipeline that finds lane lines on the road and apply it to a video stream.
 
 [//]: # (Image References)
 
+[image0]: ./test_images/solidWhiteCurve.jpg "Original image"
 [image1]: ./pipeline_progress_images/1_gray_image.jpg "Grayscaled"
 [image2]: ./pipeline_progress_images/2_blurred_image.jpg "Blurred"
 [image3]: ./pipeline_progress_images/3_edges_image.jpg "Edges"
@@ -27,27 +17,27 @@ The goals / steps of this project are the following:
 
 ---
 
-### Reflection
-
-### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
+### 1. Pipeline description.
 
 My pipeline consisted of 5 steps:
 - Convert the images to grayscale
 - Apply a gaussian blur
-- Define the region of interest (in which the lines are)
+- Define the region of interest in which the lines are supposed to be (this is not really a step in the pipeline but I index it for clarity)
 - Use canny algorithm for edge detection: firt getting full image edges and then limited to the region of interest ()
 - Apply the hough transformation to detect the lines formed by the edges: first getting the raw lines, separating them between left and right lines and averaging both groups and finally drawing the averaged lines in the region of interest
 - Superimpose the lines
 
 I do not use the color detection technique as I consider it may cause detection errors in case of different color lines (ie. yellow lines) or changing light / shadow conditions.
 
-In order to draw a single line on the left and right lanes, instead of using the openCV HoughLinesP function which return the image with the detected lines drawn on it I used the function HoughLines that returns all the lines detected in rho / theta form.
+**Getting single lines**
+
+In order to draw a single line on the left and right lanes, I do not modify the draw line function but I use the following procedure:
+
+Instead of using the openCV HoughLinesP function which return the image with the detected lines drawn on it I used the function HoughLines that returns all the lines detected in rho / theta form.
 
 Then I process all the lines and separate left and rigth lines based on the angle theta (this also allows to discard some lines like the ones detected in challenge video due to the front of the car being in the camera field) and average left and right lines to obtain two single lines.
 
-The pipeline proceeds as follows:
-
-![alt text][image1]
+The complete pipeline flow can be seen at the end of the document.
 
 
 ### 2. Identify potential shortcomings with your current pipeline
@@ -69,3 +59,32 @@ This issue occur in the challenge video that require some extra check to get the
 2. reject the hough lines obtained if they fall out certain theta values (in my experience Hough lines for the lane lines should be close to theta values of 3/4*pi and 1/4*pi).
 
 Another potential improvement could be to improve the averaging function to get a better fit to the lines which is quite good in the simple video but worse in the challenge video.
+
+
+### 4. Pipeline flow
+Original image
+![alt text][image0]
+
+Grayscale image
+![alt text][image1]
+
+Blurred image
+![alt text][image2]
+
+Canny detected edges
+![alt text][image3]
+
+Canny edges limited to the region of interest
+![alt text][image4]
+
+Hough raw lines
+![alt text][image5]
+
+Hough average lines
+![alt text][image6]
+
+Hough average lines in the region of interest
+![alt text][image7]
+
+Final result with Hough average lines superimposed in the original image
+![alt text][image8]
